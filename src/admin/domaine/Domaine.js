@@ -92,13 +92,13 @@ function Domaine() {
       cancelButtonColor: "#d33",
       confirmButtonText: "Oui",
       cancelButtonText: "Non",
-    }).then(async (result) => {
-      const selectedUser = doc(db, "domaine", id);
-  
-      await deleteDoc(selectedUser);
-  
-      domaineRead();
+    }).then(async(result) => {
       if (result.isConfirmed) {
+        const selectedUser = doc(db, "domaine", id);
+    
+        await deleteDoc(selectedUser);
+    
+        domaineRead();
         Swal.fire({
           title: "Deleted!",
           text: "Your file has been deleted.",
