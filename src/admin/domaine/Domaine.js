@@ -14,6 +14,7 @@ import { db } from "../../config/config";
 function Domaine() {
   const [domaine, setDomaine] = useState([]);
   const [isButtonForAddOrUpdate, setIsButtonForAddOrUpdate] = useState(true);
+  const [currentId, setCurrentId] = useState(0);
   let champs = document.getElementById("inputValue");
 
   const domaineAdd = async () => {
@@ -32,14 +33,16 @@ function Domaine() {
     }
 
     domaineRead();
+    champs.value="";
   };
 
   const domaineEdit = async (id) => {
     setIsButtonForAddOrUpdate(false);
+    setCurrentId(id);
     // const selectedDomaine = doc(db, "domaine", id);
     const docRef = doc(db, "domaine", id);
     const selectedDomaine = await getDoc(docRef);
-
+    console.warn("currentId",currentId);
     console.log("Document data:", selectedDomaine.data());
     champs.value = selectedDomaine.data().name;
   };
@@ -53,6 +56,9 @@ function Domaine() {
     await updateDoc(selectedDomaine, newData);
 
     domaineRead();
+    alert("modification faite");
+    champs.value="";
+    setIsButtonForAddOrUpdate(true);
   };
 
   const domaineRead = async () => {
@@ -108,7 +114,7 @@ function Domaine() {
             <button className="btn btn-danger w-25" onClick={cancelEdit}>
               Cancel
             </button>
-            <button className="btn btn-warning w-25" onClick={domaineAdd}>
+            <button className="btn btn-warning w-25" onClick={ ()=>{domaineUpdate(currentId)} }>
               Edit
             </button>
           </div>
