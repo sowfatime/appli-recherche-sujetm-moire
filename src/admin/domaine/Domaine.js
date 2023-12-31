@@ -13,9 +13,8 @@ import {
 import { db } from "../../config/config";
 function Domaine() {
   const [domaine, setDomaine] = useState([]);
+  const [isButtonForAddOrUpdate, setIsButtonForAddOrUpdate] = useState(true);
   let champs = document.getElementById("inputValue");
-  let valueForAddUpdate=0;
-  let currentId=0;
 
   const domaineAdd = async () => {
     try {
@@ -36,14 +35,13 @@ function Domaine() {
   };
 
   const domaineEdit = async (id) => {
-    currentId=id;
-    valueForAddUpdate=1;
+    setIsButtonForAddOrUpdate(false);
     // const selectedDomaine = doc(db, "domaine", id);
     const docRef = doc(db, "domaine", id);
     const selectedDomaine = await getDoc(docRef);
-    
+
     console.log("Document data:", selectedDomaine.data());
-    champs.value=selectedDomaine.data().name;
+    champs.value = selectedDomaine.data().name;
   };
   const domaineUpdate = async (id) => {
     const selectedDomaine = doc(db, "domaine", id);
@@ -80,13 +78,10 @@ function Domaine() {
     alert("suppression faite avec succès");
   };
 
-  const verifFunctionToCall=()=>{
-    if (valueForAddUpdate===0) {
-      domaineAdd();
-    }else if (valueForAddUpdate===1) {
-      domaineUpdate(currentId);
-    }
-  };
+  const cancelEdit= ()=>{
+    setIsButtonForAddOrUpdate(true);
+    champs.value="";
+  }
 
   domaineRead();
 
@@ -104,9 +99,20 @@ function Domaine() {
             className="w-100"
           />
         </div>
-        <button className="btn btn-primary w-100" onClick={verifFunctionToCall}>
-          send
-        </button>
+        {isButtonForAddOrUpdate ? (
+          <button className="btn btn-primary w-100" onClick={domaineAdd}>
+            Send
+          </button>
+        ) : (
+          <div className="d-flex justify-content-between">
+            <button className="btn btn-danger w-25" onClick={cancelEdit}>
+              Cancel
+            </button>
+            <button className="btn btn-warning w-25" onClick={domaineAdd}>
+              Edit
+            </button>
+          </div>
+        )}
       </div>
       <div className="w-75 m-auto mt-1">
         <div className="row">
