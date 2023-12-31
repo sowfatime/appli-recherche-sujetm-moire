@@ -1,5 +1,8 @@
 import "./domaine.css";
 import { React, useState } from "react";
+// import { Swal } from "sweetalert2"; 
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.css';
 
 import {
   collection,
@@ -17,6 +20,14 @@ function Domaine() {
   const [currentId, setCurrentId] = useState(0);
   let champs = document.getElementById("inputValue");
 
+  const sweetMessage = (icon, title, text) => {
+    Swal.fire({
+      icon: icon,
+      title: title,
+      text: text,
+    });
+  };
+
   const domaineAdd = async () => {
     try {
       if (champs.value === "") {
@@ -26,14 +37,14 @@ function Domaine() {
           name: champs.value,
         });
         console.log("Document written with ID: ", docRef.id);
-        alert("ajout fait");
+        sweetMessage("success", "merci", "ajout fait avec succès");
       }
     } catch (e) {
       console.error("Error adding document: ", e);
     }
 
     domaineRead();
-    champs.value="";
+    champs.value = "";
   };
 
   const domaineEdit = async (id) => {
@@ -42,7 +53,7 @@ function Domaine() {
     // const selectedDomaine = doc(db, "domaine", id);
     const docRef = doc(db, "domaine", id);
     const selectedDomaine = await getDoc(docRef);
-    console.warn("currentId",currentId);
+    console.warn("currentId", currentId);
     console.log("Document data:", selectedDomaine.data());
     champs.value = selectedDomaine.data().name;
   };
@@ -56,8 +67,8 @@ function Domaine() {
     await updateDoc(selectedDomaine, newData);
 
     domaineRead();
-    alert("modification faite");
-    champs.value="";
+    sweetMessage("success", "merci", "modification faite avec succès");
+    champs.value = "";
     setIsButtonForAddOrUpdate(true);
   };
 
@@ -72,22 +83,36 @@ function Domaine() {
     setDomaine(domaineArray);
   };
   const domaineDelete = async (id) => {
-    // let isForDelet=confirm("etes vous sûr");
-    // if (is) {
-
-    // }
-    const selectedUser = doc(db, "domaine", id);
-
-    await deleteDoc(selectedUser);
-
-    domaineRead();
-    alert("suppression faite avec succès");
+    Swal.fire({
+      title: "Etes vous sûr?",
+      text: "cette action est irréversible",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Oui",
+      cancelButtonText: "Non",
+    }).then(async (result) => {
+      const selectedUser = doc(db, "domaine", id);
+  
+      await deleteDoc(selectedUser);
+  
+      domaineRead();
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Deleted!",
+          text: "Your file has been deleted.",
+          icon: "success",
+        });
+      }
+    });
+    // sweetMessage("success", "merci", "suppression faite avec succès");
   };
 
-  const cancelEdit= ()=>{
+  const cancelEdit = () => {
     setIsButtonForAddOrUpdate(true);
-    champs.value="";
-  }
+    champs.value = "";
+  };
 
   domaineRead();
 
@@ -114,7 +139,12 @@ function Domaine() {
             <button className="btn btn-danger w-25" onClick={cancelEdit}>
               Cancel
             </button>
-            <button className="btn btn-warning w-25" onClick={ ()=>{domaineUpdate(currentId)} }>
+            <button
+              className="btn btn-warning w-25"
+              onClick={() => {
+                domaineUpdate(currentId);
+              }}
+            >
               Edit
             </button>
           </div>
